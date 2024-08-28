@@ -23,7 +23,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # Initialize FastAPI app
-app = FastAPI()
+app = FastAPI(root_path="/")
 
 # JWT token management
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
