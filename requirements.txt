@@ -1,0 +1,19 @@
+streamlit 
+pypdfium2 
+requests 
+beautifulsoup4 
+sentence-transformers 
+faiss-cpu 
+numpy 
+# ollama 
+validators 
+docx2txt
+chainlit
+langchain
+langchain_community
+PyPDF2
+chromadb
+groq
+langchain-groq
+# ollama
+python-dotenv
