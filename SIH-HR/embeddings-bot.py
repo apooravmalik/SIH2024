@@ -1,0 +1,149 @@
+from flask import Flask, render_template, request, jsonify
+from flask_cors import CORS
+import os
+import csv
+import json
+import pickle
+from sentence_transformers import SentenceTransformer, util
+
+app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes and origins
+
+LOG_FILE = 'chat_log.csv'
+KNOWLEDGE_BASE_FILE = 'knowledge_base.json'
+EMBEDDINGS_CACHE = 'embeddings_cache.pkl'
+
+# Load knowledge base from JSON file
+with open(KNOWLEDGE_BASE_FILE, 'r') as f:
+    knowledge_base = json.load(f)['knowledge_base']
+
+# Flatten the knowledge base into questions and answers
+questions = []
+answers = {}
+
+for category in knowledge_base:
+    for entry in category['entries']:
+        questions.append(entry['question'])
+        answers[entry['question']] = entry['answer']
+
+# Initialize the Sentence Transformer model
+model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+
+def save_embeddings_cache():
+    with open(EMBEDDINGS_CACHE, 'wb') as cache_file:
+        pickle.dump((questions, question_embeddings), cache_file)
+
+def load_embeddings_cache():
+    global question_embeddings
+    if os.path.exists(EMBEDDINGS_CACHE):
+        with open(EMBEDDINGS_CACHE, 'rb') as cache_file:
+            cached_questions, question_embeddings = pickle.load(cache_file)
+        # Check if cached questions match the current knowledge base
+        if cached_questions != questions:
+            update_embeddings()
+            save_embeddings_cache()
+    else:
+        update_embeddings()
+        save_embeddings_cache()
+
+def update_embeddings():
+    global question_embeddings
+    question_embeddings = model.encode(questions, convert_to_tensor=True)
+
+# Load embeddings from cache or compute them
+load_embeddings_cache()
+
+# State to track the previous interaction
+previous_interaction = {
+    'user_input': None,
+    'bot_response': None,
+    'review_submitted': True
+}
+
+def find_answer(query):
+    # Convert the query to an embedding
+    query_embedding = model.encode(query, convert_to_tensor=True)
+
+    # Compute cosine similarities between the query and all questions
+    cosine_scores = util.pytorch_cos_sim(query_embedding, question_embeddings)
+
+    # Find the index of the best match
+    best_match_index = cosine_scores.argmax().item()
+
+    # Retrieve the corresponding answer
+    response = answers[questions[best_match_index]]
+
+    return response
+
+def log_interaction(user_input, bot_response, relevant, non_relevant, review):
+    file_exists = os.path.isfile(LOG_FILE)
+    with open(LOG_FILE, 'a', newline='', encoding='utf-8') as csvfile:
+        fieldnames = ['user_input', 'bot_response', 'Relevant', 'Non_Relevant', 'Review']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+        if not file_exists:
+            writer.writeheader()
+
+        writer.writerow({
+            'user_input': user_input,
+            'bot_response': bot_response,
+            'Relevant': relevant,
+            'Non_Relevant': non_relevant,
+            'Review': review
+        })
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/api/chat', methods=['POST'])
+def chat():
+    data = request.get_json()
+    prompt = data.get('prompt')
+
+    if not prompt:
+        return jsonify({'error': 'No prompt provided'}), 400
+
+    # Check if the previous interaction's review was submitted
+    if not previous_interaction['review_submitted']:
+        # Log the previous interaction with default values for review
+        log_interaction(
+            previous_interaction['user_input'],
+            previous_interaction['bot_response'],
+            relevant='',  # Default value for relevant
+            non_relevant='',  # Default value for non-relevant
+            review=''  # Default value for review
+        )
+
+    # Find answer for the new query
+    response = find_answer(prompt)
+
+    # Update the previous interaction state
+    previous_interaction['user_input'] = prompt
+    previous_interaction['bot_response'] = response
+    previous_interaction['review_submitted'] = False
+
+    return jsonify({'response': response})
+
+@app.route('/api/log', methods=['POST'])
+def log():
+    data = request.get_json()
+
+    user_input = data.get('user_input')
+    bot_response = data.get('bot_response')
+    button1_state = data.get('button1_state')
+    button2_state = data.get('button2_state')
+    review_text = data.get('review_text')
+
+    if not all([user_input, bot_response, button1_state, button2_state, review_text]):
+        return jsonify({'error': 'Incomplete data'}), 400
+
+    log_interaction(user_input, bot_response, button1_state, button2_state, review_text)
+
+    # Update the previous interaction state to indicate the review was submitted
+    previous_interaction['review_submitted'] = True
+
+    return jsonify({'status': 'Log saved'})
+
+if __name__ == '__main__':
+    app.run(debug=True)
