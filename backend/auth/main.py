@@ -67,6 +67,14 @@ class LoginRequest(BaseModel):
 class VerifyOTPRequest(BaseModel):
     username: str
     otp: str
+    
+class UserDetails(BaseModel):
+    name: str
+    phone_number: str
+    email: str
+    team: str
+    designation: str
+    holidays_taken: int
 
 # Utility functions
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
@@ -165,3 +173,38 @@ async def read_users_me(token: str = Depends(oauth2_scheme)):
     if user is None:
         raise credentials_exception
     return user
+
+
+@app.post("/add-user-details/")
+async def add_user_details(user_details: UserDetails, token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+
+    # Get the user's ID from the users table
+    user_response = supabase.table("users").select("id").eq("username", username).execute()
+    if not user_response.data:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user_id = user_response.data[0]['id']
+
+    # Prepare user details data
+    user_details_data = user_details.dict()
+    user_details_data['user_id'] = user_id
+
+    # Insert user details into the user_details table
+    response = supabase.table("user_details").insert(user_details_data).execute()
+
+    if response.data:
+        return {"message": "User details added successfully"}
+    else:
+        raise HTTPException(status_code=400, detail="Failed to add user details")

@@ -8,6 +8,7 @@ import Dashboard from './Components/Dashboard';
 import ProtectedRoute from './Components/ProtectedRoute';
 import PolicyChat from './Components/PolicyChat';
 import RagSystem from './Components/RagSystem';
+import UserDetails from './Components/UserDetails';
 
 const App = () => {
   return (
@@ -23,6 +24,7 @@ const App = () => {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/policy-chat" element={<PolicyChat />} />
             <Route path="/rag-system" element={<RagSystem />} />
+            <Route path="/user" element={<UserDetails />} />
           </Route>
         </Routes>
       </div>
