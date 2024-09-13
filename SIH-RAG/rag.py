@@ -14,6 +14,7 @@ from langchain.chains.conversation.memory import ConversationBufferWindowMemory
 from langchain_groq import ChatGroq
 from dotenv import load_dotenv
 from flask_cors import CORS
+from better_profanity import profanity  # Import the profanity filter
 load_dotenv()
 
 app = Flask(__name__)
@@ -23,7 +24,7 @@ CORS(app)
 groq_api_key = os.environ['GROQ_API_KEY']
 
 class RAGSystem:
-    def __init__(self, model_name='all-MiniLM-L6-v2', llm_model='mixtral-8x7b-32768'):
+    def __init__(self, model_name='all-MiniLM-L6-v2', llm_model='llama-3.1-8b-instant'):
         self.model = SentenceTransformer(model_name)
         self.index = None
         self.memory = ConversationBufferWindowMemory(k=5)  # Adjustable memory length
@@ -176,6 +177,10 @@ def process_documents():
 @app.route('/answer_question', methods=['POST'])
 def answer_question():
     query = request.form.get('query')
+
+    # Profanity check before processing the query
+    if profanity.contains_profanity(query):
+        return jsonify({'error': "Please use appropriate language to ask your question."}), 400
     if not query:
         return jsonify({'error': "Please provide a query."}), 400
 
@@ -193,6 +198,11 @@ def answer_question():
 @app.route('/chat', methods=['POST'])
 def chat():
     user_message = request.form.get('message')
+
+    # Profanity check before processing the message
+    if profanity.contains_profanity(user_message):
+        return jsonify({'response': "Please use appropriate language to chat."}), 400
+    
     if not user_message:
         return jsonify({'error': "Please enter a message to chat with the LLM."}), 400
 
@@ -201,4 +211,4 @@ def chat():
     return jsonify({'response': response})
 
 if __name__ == '__main__':
-    app.run(debug=True, port=7000)
+    app.run(debug=True, port=8001)

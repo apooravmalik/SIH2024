@@ -1,10 +1,17 @@
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 import os
-import csv
 import json
 import pickle
 from sentence_transformers import SentenceTransformer, util
+from better_profanity import profanity  # Import the profanity filter
+from supabase import create_client, Client
+
+SUPABASE_URL = "https://vkhchvapbnxxwfiqzusp.supabase.co"  # Your Supabase project URL
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZraGNodmFwYm54eHdmaXF6dXNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQ1NzcyMjAsImV4cCI6MjA0MDE1MzIyMH0.0zfIP46aVi3clJ1wzmJwl1L4dCCp6U7cx5XiFAt6bgY"  # Your Supabase API Key
+LOG_TABLE = 'chat_logs'
+# Initialize Supabase client
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes and origins
@@ -76,21 +83,16 @@ def find_answer(query):
     return response
 
 def log_interaction(user_input, bot_response, relevant, non_relevant, review):
-    file_exists = os.path.isfile(LOG_FILE)
-    with open(LOG_FILE, 'a', newline='', encoding='utf-8') as csvfile:
-        fieldnames = ['user_input', 'bot_response', 'Relevant', 'Non_Relevant', 'Review']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    # Insert data into Supabase table
+    data = {
+        'user_input': user_input,
+        'bot_response': bot_response,
+        'relevant': relevant,
+        'non_relevant': non_relevant,
+        'review': review
+    }
 
-        if not file_exists:
-            writer.writeheader()
-
-        writer.writerow({
-            'user_input': user_input,
-            'bot_response': bot_response,
-            'Relevant': relevant,
-            'Non_Relevant': non_relevant,
-            'Review': review
-        })
+    supabase.table(LOG_TABLE).insert(data).execute()
 
 @app.route('/')
 def index():
@@ -104,16 +106,23 @@ def chat():
     if not prompt:
         return jsonify({'error': 'No prompt provided'}), 400
 
-    # Check if the previous interaction's review was submitted
-    if not previous_interaction['review_submitted']:
-        # Log the previous interaction with default values for review
+    # Check for bad language using better_profanity
+    if profanity.contains_profanity(prompt):
+        # Log the interaction with the inappropriate language response
         log_interaction(
-            previous_interaction['user_input'],
-            previous_interaction['bot_response'],
-            relevant='',  # Default value for relevant
-            non_relevant='',  # Default value for non-relevant
-            review=''  # Default value for review
+            user_input=prompt,
+            bot_response='Please use appropriate language to ask the question',
+            relevant='',
+            non_relevant='',
+            review=''
         )
+
+        # Update the previous interaction state
+        previous_interaction['user_input'] = prompt
+        previous_interaction['bot_response'] = 'Please use appropriate language to ask the question'
+        previous_interaction['review_submitted'] = False
+
+        return jsonify({'response': 'Please use appropriate language to ask the question'}), 200
 
     # Find answer for the new query
     response = find_answer(prompt)
@@ -138,10 +147,10 @@ def log():
     if not all([user_input, bot_response, button1_state, button2_state, review_text]):
         return jsonify({'error': 'Incomplete data'}), 400
 
-    log_interaction(user_input, bot_response, button1_state, button2_state, review_text)
-
-    # Update the previous interaction state to indicate the review was submitted
-    previous_interaction['review_submitted'] = True
+    # Log the interaction only if the user has clicked the submit button
+    if previous_interaction['bot_response'] != 'Please use appropriate language to ask the question':
+        log_interaction(user_input, bot_response, button1_state, button2_state, review_text)
+        previous_interaction['review_submitted'] = True
 
     return jsonify({'status': 'Log saved'})
 
