@@ -20,7 +20,7 @@ const OTPVerification = () => {
     }),
     onSubmit: async (values) => {
       try {
-        const response = await axios.post('http://localhost:8000/verify-otp/', {
+        const response = await axios.post('http://localhost:8000/api/auth/verify-otp/', {
           username,
           otp: values.otp,
         });

@@ -23,12 +23,12 @@ const RagSystem = () => {
     setUploadedFiles(files);
     setIsLoading(true);
     setIsThinking(true);
-
+  
     const formData = new FormData();
     for (let file of files) {
       formData.append('files', file);
     }
-
+  
     const fileType = files[0].type;
     if (fileType.includes('pdf')) {
       formData.append('input_type', 'PDFs');
@@ -37,8 +37,12 @@ const RagSystem = () => {
     } else if (fileType.includes('text')) {
       formData.append('input_type', 'TXT Files');
     }
-
-    axios.post('http://localhost:7000/process_documents', formData)
+  
+    axios.post('http://localhost:8000/api/rag/process_documents', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
       .then(res => {
         console.log(res.data);
         setIsLoading(false);
@@ -59,15 +63,19 @@ const RagSystem = () => {
 
   const handleSubmit = () => {
     if (!userInput.trim()) return;
-
+  
     setMessages(prevMessages => [...prevMessages, { text: userInput, isUser: true }]);
     setIsThinking(true);
-
+  
     const endpoint = activeTab === 'RAG Chat' ? '/answer_question' : '/chat';
-    const formData = new FormData();
-    formData.append('query', userInput);
-
-    axios.post(`http://localhost:7000${endpoint}`, formData)
+    
+    axios.post(`http://localhost:8000/api/rag${endpoint}`, {
+      message: userInput  // Changed from 'query' to 'message' to match your FastAPI endpoint
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
       .then(res => {
         setIsThinking(false);
         setMessages(prevMessages => [...prevMessages, { text: res.data.answer || res.data.response, isUser: false }]);
@@ -78,7 +86,7 @@ const RagSystem = () => {
         setIsThinking(false);
         setMessages(prevMessages => [...prevMessages, { text: "Error processing your request.", isUser: false }]);
       });
-
+  
     setUserInput('');
   };
 
@@ -92,7 +100,7 @@ const RagSystem = () => {
     formData.append('input_type', 'URLs');
     formData.append('urls', url);
 
-    axios.post('http://localhost:7000/process_documents', formData)
+    axios.post('http://localhost:8000/api/rag/process_documents', formData)
       .then(res => {
         console.log(res.data);
         setIsLoading(false);

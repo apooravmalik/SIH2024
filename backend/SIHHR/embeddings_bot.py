@@ -6,6 +6,17 @@ import pickle
 from sentence_transformers import SentenceTransformer, util
 from better_profanity import profanity  # Import the profanity filter
 from supabase import create_client, Client
+import os
+
+# Get the directory of the current script
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+# Use absolute paths for files
+LOG_FILE = os.path.join(SCRIPT_DIR, 'chat_log.csv')
+KNOWLEDGE_BASE_FILE = os.path.join(SCRIPT_DIR, 'knowledge_base.json')
+EMBEDDINGS_CACHE = os.path.join(SCRIPT_DIR, 'embeddings_cache.pkl')
+
 
 SUPABASE_URL = "https://vkhchvapbnxxwfiqzusp.supabase.co"  # Your Supabase project URL
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZraGNodmFwYm54eHdmaXF6dXNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQ1NzcyMjAsImV4cCI6MjA0MDE1MzIyMH0.0zfIP46aVi3clJ1wzmJwl1L4dCCp6U7cx5XiFAt6bgY"  # Your Supabase API Key
@@ -16,9 +27,6 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes and origins
 
-LOG_FILE = 'chat_log.csv'
-KNOWLEDGE_BASE_FILE = 'knowledge_base.json'
-EMBEDDINGS_CACHE = 'embeddings_cache.pkl'
 
 # Load knowledge base from JSON file
 with open(KNOWLEDGE_BASE_FILE, 'r') as f:

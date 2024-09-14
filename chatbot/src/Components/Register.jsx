@@ -24,7 +24,7 @@ const Register = () => {
     }),
     onSubmit: async (values) => {
       try {
-        const response = await axios.post('http://localhost:8000/register/', {
+        const response = await axios.post('http://localhost:8000/api/auth/register', {
           username: values.username,
           email: values.email,
           password: values.password,

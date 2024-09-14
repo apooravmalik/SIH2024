@@ -26,7 +26,7 @@ const PolicyChat = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/chat', { prompt: input });
+      const response = await axios.post('http://localhost:8000/api/hr/chat/', { prompt: input });
       const botMessage = { type: 'bot', content: response.data.response };
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {

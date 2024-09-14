@@ -21,7 +21,7 @@ const Login = () => {
     }),
     onSubmit: async (values) => {
       try {
-        const response = await axios.post('http://127.0.0.1:8000/login/', values);
+        const response = await axios.post('http://127.0.0.1:8000/api/auth/login/', values);
         console.log('Login successful, OTP sent to email:', response.data);
         localStorage.setItem('username', values.username);
         navigate('/otp');

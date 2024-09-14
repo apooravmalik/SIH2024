@@ -8,8 +8,15 @@ import pyotp
 from supabase import create_client, Client
 import os
 from dotenv import load_dotenv
-from email_utils import send_email
+from auth.email_utils import send_email
 import logging
+import sys
+import os
+
+# Add the auth directory to the Python path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+from email_utils import send_email
 
 # Load environment variables
 load_dotenv()
