@@ -26,3 +26,4 @@ langchain-groq
 python-dotenv
 better_profanity
 pydantic
+validators

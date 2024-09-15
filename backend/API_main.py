@@ -192,13 +192,12 @@ class ChatRequest(BaseModel):
     message: str
 
 @app.post("/api/rag/chat")
-async def chat(request: ChatRequest):
+async def chat(query: str = Form(...)):
     try:
-        user_message = request.message
-        if not user_message:
+        if not query:
             raise HTTPException(status_code=400, detail="Please enter a message to chat with the LLM.")
 
-        response = rag_system.chat_with_llm(user_message)
+        response = rag_system.chat_with_llm(query)
         return {"response": response}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

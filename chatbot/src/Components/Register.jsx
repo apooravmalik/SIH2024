@@ -2,7 +2,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import { Fade, Slide } from 'react-awesome-reveal';
-import backgroundImage from '../assets/Hero.png';
+import backgroundImage from '../assets/hero2.jpg';
 import { useNavigate } from 'react-router-dom';
 
 const Register = () => {

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { Upload, Send } from "lucide-react";
 import { Fade } from "react-awesome-reveal";
-import backgroundImage from "../assets/Hero.png";
+import backgroundImage from "../assets/hero2.jpg";
 
 const RagSystem = () => {
   const [activeTab, setActiveTab] = useState("RAG Chat");
@@ -66,26 +66,37 @@ const RagSystem = () => {
 
   const handleSubmit = () => {
     if (!userInput.trim()) return;
-
+  
     setMessages((prevMessages) => [
       ...prevMessages,
       { text: userInput, isUser: true },
     ]);
     setIsThinking(true);
-
+  
     const endpoint = activeTab === "RAG Chat" ? "/answer_question" : "/chat";
-    const formData = new FormData();
-    formData.append('query', userInput);
-
+    let data;
+    let headers;
+  
+    if (activeTab === "RAG Chat") {
+      // For /answer_question endpoint (FormData)
+      data = new FormData();
+      data.append('query', userInput);
+      headers = {
+        "Content-Type": "multipart/form-data",
+      };
+    } else {
+      // For /chat endpoint (JSON)
+      data = { message: userInput };
+      headers = {
+        "Content-Type": "application/json",
+      };
+    }
+  
     axios
       .post(
         `http://localhost:8000/api/rag${endpoint}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        data,
+        { headers }
       )
       .then((res) => {
         setIsThinking(false);
@@ -104,7 +115,7 @@ const RagSystem = () => {
           { text: "Error processing your request.", isUser: false },
         ]);
       });
-
+  
     setUserInput("");
   };
 

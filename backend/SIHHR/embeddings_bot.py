@@ -7,6 +7,12 @@ from sentence_transformers import SentenceTransformer, util
 from better_profanity import profanity  # Import the profanity filter
 from supabase import create_client, Client
 import os
+import sys
+
+# Add the parent directory of 'auth' to the Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from config import SUPABASE_URL, SUPABASE_KEY, SECRET_KEY, SMTP_PORT, SMTP_SERVER, SMTP_USER, SMTP_PASSWORD
 
 # Get the directory of the current script
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -18,8 +24,6 @@ KNOWLEDGE_BASE_FILE = os.path.join(SCRIPT_DIR, 'knowledge_base.json')
 EMBEDDINGS_CACHE = os.path.join(SCRIPT_DIR, 'embeddings_cache.pkl')
 
 
-SUPABASE_URL = "https://vkhchvapbnxxwfiqzusp.supabase.co"  # Your Supabase project URL
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZraGNodmFwYm54eHdmaXF6dXNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQ1NzcyMjAsImV4cCI6MjA0MDE1MzIyMH0.0zfIP46aVi3clJ1wzmJwl1L4dCCp6U7cx5XiFAt6bgY"  # Your Supabase API Key
 LOG_TABLE = 'chat_logs'
 # Initialize Supabase client
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)

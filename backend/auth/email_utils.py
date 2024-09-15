@@ -4,14 +4,21 @@ from email.mime.text import MIMEText
 from email.utils import formataddr
 import os
 from dotenv import load_dotenv
+import sys
+import os
+
+# Add the parent directory of 'backend' to the Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+from backend.config import SMTP_PORT, SMTP_SERVER, SMTP_USER, SMTP_PASSWORD
 
 # Load environment variables
-load_dotenv()
+# load_dotenv()
 
-SMTP_SERVER = os.getenv("SMTP_SERVER")
-SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))  # Default to 587 if not set
-SMTP_USER = os.getenv("SMTP_USER", "noreply@yourdomain.com")  # Provide a default value
-SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
+# SMTP_SERVER = os.getenv("SMTP_SERVER")
+# SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))  # Default to 587 if not set
+# SMTP_USER = os.getenv("SMTP_USER", "noreply@yourdomain.com")  # Provide a default value
+# SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
 
 def send_email(to: str, subject: str, body: str):
     if not to or not subject or not body:

@@ -1,5 +1,4 @@
-import React from 'react';
-import backgroundImage from '../assets/Hero.png';
+import backgroundImage from '../assets/hero2.jpg';
 import { Fade, Zoom } from 'react-awesome-reveal';
 import { Link } from 'react-router-dom';
 
@@ -21,12 +20,12 @@ const Hero = () => {
         <div className="relative z-10 text-white container mx-auto px-4 text-center">
           <Fade cascade triggerOnce direction="up">
             <h1 className="text-5xl font-bold mb-6">
-              Connecting You to Answers: <br /> Welcome to RAGFusion
+              Connecting You to Answers: <br /> Welcome to HRGenie
             </h1>
           </Fade>
           <Fade delay={200} triggerOnce>
             <p className="text-lg mb-8 max-w-2xl mx-auto">
-              RAGFusion is your centralized platform for all employee queries and support. Easily access assistance, get documents processed, and find answers to your questions quickly and efficiently.
+              HRGenie is your centralized platform for all employee queries and support. Easily access assistance, get documents processed, and find answers to your questions quickly and efficiently.
             </p>
           </Fade>
           <Zoom delay={400} triggerOnce>

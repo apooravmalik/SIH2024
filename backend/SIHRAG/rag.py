@@ -15,13 +15,23 @@ from langchain_groq import ChatGroq
 from dotenv import load_dotenv
 from flask_cors import CORS
 from better_profanity import profanity  # Import the profanity filter
+
+import os
+import sys
+
+# Add the parent directory of 'auth' to the Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from config import SUPABASE_URL, SUPABASE_KEY, SECRET_KEY, SMTP_PORT, SMTP_SERVER, SMTP_USER, SMTP_PASSWORD, GROQ_API_KEY as groq_api_key
+
+
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
 
-groq_api_key = os.environ['GROQ_API_KEY']
+# groq_api_key = os.environ['GROQ_API_KEY']
 
 class RAGSystem:
     def __init__(self, model_name='all-MiniLM-L6-v2', llm_model='llama-3.1-8b-instant'):

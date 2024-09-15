@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Fade, Slide } from "react-awesome-reveal";
-import backgroundImage from "../assets/Hero.png";
+import backgroundImage from "../assets/hero2.jpg";
 
 const Dashboard = () => {
   const [username, setUsername] = useState("");

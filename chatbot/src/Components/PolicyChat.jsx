@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { Fade, Slide } from 'react-awesome-reveal';
 import { Send } from 'lucide-react';
-import backgroundImage from '../assets/Hero.png';
+import backgroundImage from '../assets/hero2.jpg';
 
 const PolicyChat = () => {
   const [messages, setMessages] = useState([]);

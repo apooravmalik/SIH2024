@@ -2,7 +2,7 @@ import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
-import backgroundImage from "../assets/Hero.png";
+import backgroundImage from "../assets/hero2.jpg";
 
 const UserDetails = () => {
   const initialValues = {

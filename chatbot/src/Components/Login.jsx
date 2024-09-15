@@ -3,7 +3,7 @@ import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Fade, Slide } from 'react-awesome-reveal';
-import backgroundImage from '../assets/Hero.png';
+import backgroundImage from '../assets/hero2.jpg';
 
 const Login = () => {
   const navigate = useNavigate();

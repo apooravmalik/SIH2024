@@ -1,6 +1,5 @@
-import React from 'react';
 import { Link } from "react-router-dom";
-import logo from "../assets/logo.png";
+// import logo from "../assets/logo.png";
 import { Fade } from "react-awesome-reveal";
 
 const Navbar = () => {
@@ -16,8 +15,8 @@ const Navbar = () => {
     <nav className="bg-transparent fixed top-0 left-0 w-full flex justify-between items-center p-4 z-50">
       <Fade triggerOnce>
         <div className="flex items-center">
-          <img src={logo} alt="GAIL Logo" className="h-8 w-auto mr-3" />
-          <span className="text-white font-bold text-lg">GAIL</span>
+          {/* <img src={logo} alt="HRGenie Logo" className="h-8 w-auto mr-3" /> */}
+          <span className="text-white font-bold text-lg">HRGenie</span>
         </div>
         <div className="hidden md:flex space-x-6">
           <Link to="/" className="text-white hover:text-gray-300">

@@ -8,23 +8,26 @@ import pyotp
 from supabase import create_client, Client
 import os
 from dotenv import load_dotenv
-from auth.email_utils import send_email
+# from auth.email_utils import send_email
 import logging
 import sys
 import os
 
-# Add the auth directory to the Python path
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+# Add the parent directory of 'auth' to the Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from email_utils import send_email
+from config import SUPABASE_URL, SUPABASE_KEY, SECRET_KEY, SMTP_PORT, SMTP_SERVER, SMTP_USER, SMTP_PASSWORD
+
+from .email_utils import send_email
 
 # Load environment variables
 load_dotenv()
 
+
 # Constants
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-SECRET_KEY = os.getenv("SECRET_KEY")
+# SUPABASE_URL = os.getenv("SUPABASE_URL")
+# SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+# SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
