@@ -108,11 +108,19 @@ const RagSystem = () => {
         setResponse(responseText);
       })
       .catch((err) => {
-        console.error(err);
         setIsThinking(false);
+        let errorMessage;
+        if (err.response && err.response.status === 400) {
+          // Handle 400 Bad Request errors, including profanity cases
+          errorMessage = err.response.data.detail || "Please use appropriate language or provide a valid query.";
+        } else {
+          // Handle other types of errors
+          errorMessage = "Error processing your request. Please try again.";
+        }
+        console.error(err);
         setMessages((prevMessages) => [
           ...prevMessages,
-          { text: "Error processing your request.", isUser: false },
+          { text: errorMessage, isUser: false },
         ]);
       });
   

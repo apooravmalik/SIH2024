@@ -93,9 +93,26 @@ class LogRequest(BaseModel):
 @app.post("/api/hr/chat")
 async def chat(request: ChatRequest):
     try:
+        logger.debug(f"Received prompt: {request.prompt}")
+        
+        if not request.prompt:
+            return JSONResponse(
+                status_code=400,
+                content={"response": "Please provide a query."}
+            )
+
+        # Profanity check before processing the query
+        if profanity.contains_profanity(request.prompt):
+            logger.warning(f"Profanity detected in prompt: {request.prompt}")
+            return JSONResponse(
+                status_code=400,
+                content={"response": "Please use appropriate language to ask your question."}
+            )
+
         response = embeddings_bot.find_answer(request.prompt)
         return {"response": response}
     except Exception as e:
+        logger.error(f"Error in chat endpoint: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/api/hr/log")
