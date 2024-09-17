@@ -37,12 +37,16 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 
 
 
-## commands to run
-Backend:
-- ```cd backend```
-- ```pip install -r requirements.txt (if not working --user)```
-- ```python API_main.py```
-Frontend:
-- ```cd chatbot```
-- ```npm i```
-- ```npm run dev```
+### Backend
+```
+cd backend
+pip install -r requirements.txt (if not working --user)
+python API_main.py
+```
+
+### Frontend
+```
+cd chatbot
+npm i
+npm run dev
+```
