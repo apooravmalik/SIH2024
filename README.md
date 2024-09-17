@@ -44,5 +44,5 @@ Backend:
 - ```python API_main.py```
 Frontend:
 - ```cd chatbot```
--```npm i```
+- ```npm i```
 - ```npm run dev```
